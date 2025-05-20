@@ -25,7 +25,7 @@ const CreateCategoryModal = ({ onClose, onSubmit, existingCategory }) => {
             <div style={styles.modal}>
                 <h2 style={styles.novaCategoria}>
                     {existingCategory ? 'Editar Categoria': 'Nova Categoria'}</h2>
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} style={styles.form}>
                     <input
                         type="text"
                         placeholder="Nome da Categoria"
@@ -73,7 +73,7 @@ const styles = {
     },
     modal: {
         backgroundColor: '#fff',
-        padding: '20px',
+        padding: '24px',
         borderRadius: '12px',
         width: '320px',
         boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
@@ -81,9 +81,15 @@ const styles = {
         flexDirection: 'column',
         alignItems: 'center',
     },
+    form: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        width: '100%',
+    },
     input: {
         width: '100%',
-        padding: '10px',
+        padding: '8px',
         margin: '10px 0',
         borderRadius: '6px',
         border: '1px solid #ccc',
@@ -91,7 +97,9 @@ const styles = {
     },
     actions: {
         display: 'flex',
-        justifyContent: 'space-between',
+        justifyContent: 'center',
+        gap: '10px',
+        marginTop: '16px',
     },
     saveButton: {
         backgroundColor: '#e60000',
