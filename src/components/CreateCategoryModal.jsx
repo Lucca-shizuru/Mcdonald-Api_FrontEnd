@@ -1,18 +1,30 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 
-const CreateCategoryModal = ({ onClose, onSubmit }) => {
-    const [categoryName, setCategoryName] = useState('');
+const CreateCategoryModal = ({ onClose, onSubmit, existingCategory }) => {
+    const [categoryName, setCategoryName] = useState(existingCategory?.categoryName);
+    const [imageFile, setImageFile] = useState(null);
 
-    const handleSubmit = (e) => {
+    useEffect(() => {
+        if (existingCategory) {
+            setCategoryName(existingCategory.categoryName);
+        }
+    }, [existingCategory]);
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!categoryName.trim()) return;
-        onSubmit({ categoryName });
+        if (!categoryName) {
+            alert("O nome da categoria é obrigatório.");
+            return;
+        }
+        await onSubmit({ categoryName, imageFile });
     };
+
 
     return (
         <div style={styles.overlay}>
             <div style={styles.modal}>
-                <h2 style={styles.novaCategoria}>Nova Categoria</h2>
+                <h2 style={styles.novaCategoria}>
+                    {existingCategory ? 'Editar Categoria': 'Nova Categoria'}</h2>
                 <form onSubmit={handleSubmit}>
                     <input
                         type="text"
@@ -21,6 +33,13 @@ const CreateCategoryModal = ({ onClose, onSubmit }) => {
                         onChange={(e) => setCategoryName(e.target.value)}
                         style={styles.input}
                     />
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => setImageFile(e.target.files[0])}
+                        style={{ marginTop: '10px' }}
+                        />
+
                     <div style={styles.actions}>
                         <button type="submit" style={styles.saveButton}>Salvar</button>
                         <button type="button" onClick={onClose} style={styles.cancelButton}>Cancelar</button>
@@ -35,9 +54,13 @@ const styles = {
     novaCategoria: {
         color: '#ffcc00',
         backgroundColor: '#e60000',
-        padding: '10px 20px',
+        padding: '10px 18px',
         borderRadius: '12px',
         boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+        fontWeight: 'bold',
+        width: '100%',
+        textAlign: 'center',
+        marginBottom: '10px',
     },
     overlay: {
         position: 'fixed',
@@ -52,8 +75,11 @@ const styles = {
         backgroundColor: '#fff',
         padding: '20px',
         borderRadius: '12px',
-        width: '300px',
+        width: '320px',
         boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
     },
     input: {
         width: '100%',
@@ -61,6 +87,7 @@ const styles = {
         margin: '10px 0',
         borderRadius: '6px',
         border: '1px solid #ccc',
+        textAlign: 'center',
     },
     actions: {
         display: 'flex',

@@ -6,6 +6,7 @@ import CreateCategoryModal from '../components/CreateCategoryModal';
 const Categories = () => {
     const [categories, setCategories] = useState([]);
     const [showModal, setShowModal] = useState(false);
+    const [editingCategory, setEditingCategory] = useState(null);
 
     const loadCategories = async () => {
         try {
@@ -21,7 +22,8 @@ const Categories = () => {
     }, []);
 
     const handleEdit = (category) => {
-        alert(`Editar categoria: ${category.categoryName}`);
+        setEditingCategory(category);
+        setShowModal(true);
     };
 
     const handleDelete = async (categoryId) => {
@@ -36,9 +38,26 @@ const Categories = () => {
         }
     };
 
-    const handleCreate = async (newCategory) => {
+    const uploadImage = async (file) => {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await api.post('/categories/upload', formData, {
+            headers: { 'Content-type': 'multipart/form-data' }
+        });
+        return response.data;
+    };
+
+    const handleCreate = async (categoryName, imageFile) => {
         try {
-            await api.post('/categories', newCategory);
+            let imageUrl = null;
+            if (imageFile) {
+                imageUrl = await uploadImage(imageFile);
+            }
+            await api.post('/categories', {
+                categoryName,
+                imageUrl
+            });
             setShowModal(false);
             loadCategories();
         } catch (error) {
@@ -46,13 +65,33 @@ const Categories = () => {
         }
     };
 
+    const handleUpdate = async (updateCategory) => {
+        try {
+            let imageUrl = updateCategory.imageUrl || null;
+
+            if (updateCategory.imageFile) {
+                imageUrl = await uploadImage(updateCategory.imageFile);
+            }
+
+            await api.put(`/categories/${updateCategory.id}`, {
+                categoryName: updateCategory.categoryName,
+                imageUrl
+            });
+            setShowModal(false);
+            setEditingCategory(null);
+            loadCategories();
+        } catch (error) {
+            console.error('Erro ao atualizar a categoria', error);
+        }
+    };
+
     return (
         <div style={{ padding: '30px' }}>
             <div style={styles.header}>
-                <div style={styles.titleBox}>
-                    <h1 style={styles.title}>Categorias</h1>
+                <div style={styles.caixaDoTitulo}>
+                    <h1 style={styles.tituloPrincipal}>Categorias</h1>
                 </div>
-                <button onClick={() => setShowModal(true)} style={styles.addButton}>
+                <button onClick={() => setShowModal(true)} style={styles.botaoAdicionar}>
                     + Nova Categoria
                 </button>
             </div>
@@ -70,8 +109,19 @@ const Categories = () => {
 
             {showModal && (
                 <CreateCategoryModal
-                    onClose={() => setShowModal(false)}
-                    onSubmit={handleCreate}
+                    onClose={() => {
+                        setShowModal(false);
+                        setEditingCategory(null);
+                    }}
+                    onSubmit={(data) => {
+                        if (editingCategory) {
+                            // Passa o id junto com os dados para o update
+                            handleUpdate({ id: editingCategory.categoryId, ...data });
+                        } else {
+                            handleCreate(data.categoryName, data.imageFile);
+                        }
+                    }}
+                    existingCategory={editingCategory}
                 />
             )}
         </div>
@@ -79,16 +129,16 @@ const Categories = () => {
 };
 
 const styles = {
-    titleBox: {
+    caixaDoTitulo: {
         backgroundColor: '#e60000',
-        padding: '10px 20px',
+        padding: '20px 80px',
         borderRadius: '12px',
         boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
     },
-    title: {
+    tituloPrincipal: {
         color: 'white',
-        margin:0,
-        fontSize: '14px',
+        margin: 0,
+        fontSize: '20px',
         fontWeight: 'bold',
         letterSpacing: '1px',
     },
@@ -103,8 +153,8 @@ const styles = {
         justifyContent: 'space-between',
         alignItems: 'center',
     },
-    addButton: {
-        padding: '10px 16px',
+    botaoAdicionar: {
+        padding: '20px 80px',
         backgroundColor: '#e60000',
         color: 'white',
         border: 'none',

@@ -4,6 +4,13 @@ import { Pencil, Trash2 } from 'lucide-react';
 const CategoryCard = ({ category, onEdit, onDelete }) => {
     return (
         <div style={styles.card}>
+            {category.imageUrl && (
+                <img
+                    src={category.imageUrl}
+                    alt={category.categoryName}
+                    style={styles.image}
+                    />
+            )}
             <h3 style={styles.title}>{category.categoryName}</h3>
             <div style={styles.actions}>
                 <button onClick={() => onEdit(category)} style={styles.editButton}>
@@ -26,6 +33,13 @@ const styles = {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
+    },
+    image: {
+        idth: '100%',
+        height: '150px',
+        objectFit: 'cover',
+        borderRadius: '12px',
+        marginBottom: '12px',
     },
     title: {
         fontSize: '18px',
