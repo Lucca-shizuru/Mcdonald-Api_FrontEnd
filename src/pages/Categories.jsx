@@ -115,7 +115,6 @@ const Categories = () => {
                     }}
                     onSubmit={(data) => {
                         if (editingCategory) {
-                            // Passa o id junto com os dados para o update
                             handleUpdate({ id: editingCategory.categoryId, ...data });
                         } else {
                             handleCreate(data.categoryName, data.imageFile);
@@ -144,7 +143,7 @@ const styles = {
     },
     grid: {
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
         gap: '16px',
         marginTop: '20px',
     },
