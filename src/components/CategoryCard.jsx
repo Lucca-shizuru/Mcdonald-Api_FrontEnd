@@ -44,7 +44,7 @@ const styles = {
         marginBottom: '12px',
     },
     title: {
-        fontSize: '18px',
+        fontSize: '20px',
         fontWeight: 'bold',
         marginBottom: '12px',
         color: '#333',

@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import api from '../services/Api';
 import CategoryCard from '../components/CategoryCard';
 import CreateCategoryModal from '../components/CreateCategoryModal';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Categories = () => {
     const [categories, setCategories] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [editingCategory, setEditingCategory] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
 
     const loadCategories = async () => {
         try {
@@ -84,9 +86,22 @@ const Categories = () => {
             console.error('Erro ao atualizar a categoria', error);
         }
     };
+    const filteredCategories = categories.filter((cat) =>
+        cat.categoryName.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     return (
         <div style={{ padding: '30px' }}>
+            <div style={styles.searchContainer}>
+                <input
+                    type="text"
+                    placeholder="🔍Buscar categoria"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    style={styles.searchInput}
+                />
+            </div>
+
             <div style={styles.header}>
                 <div style={styles.caixaDoTitulo}>
                     <h1 style={styles.tituloPrincipal}>Categorias</h1>
@@ -97,14 +112,23 @@ const Categories = () => {
             </div>
 
             <div style={styles.grid}>
-                {categories.map((cat) => (
-                    <CategoryCard
-                        key={cat.categoryId}
-                        category={cat}
-                        onEdit={handleEdit}
-                        onDelete={handleDelete}
-                    />
-                ))}
+                <AnimatePresence>
+                    {filteredCategories.map((cat) => (
+                        <motion.div
+                            key={cat.categoryId}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            transition={{ duration: 0.4, ease: 'easeOut' }}
+                        >
+                            <CategoryCard
+                                category={cat}
+                                onEdit={handleEdit}
+                                onDelete={handleDelete}
+                            />
+                        </motion.div>
+                    ))}
+                </AnimatePresence>
             </div>
 
             {showModal && (
@@ -128,6 +152,7 @@ const Categories = () => {
 };
 
 const styles = {
+
     caixaDoTitulo: {
         backgroundColor: '#e60000',
         padding: '20px 80px',
@@ -159,6 +184,18 @@ const styles = {
         border: 'none',
         borderRadius: '8px',
         cursor: 'pointer',
+    },
+    searchContainer: {
+        display: 'flex',
+        justifyContent: 'flex-end',
+        marginBottom: '10px',
+    },
+    searchInput: {
+        padding: '8px 12px',
+        borderRadius: '8px',
+        border: '1px solid #ccc',
+        width: '220px',
+        fontSize: '14px',
     },
 };
 
